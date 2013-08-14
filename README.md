@@ -1,4 +1,4 @@
-# ``flap`` - прослушивание unix pipe [![Build Status](https://secure.travis-ci.org/avz/flap.png?branch=master)](http://travis-ci.org/avz/flap)
+# ``flap`` [![Build Status](https://secure.travis-ci.org/avz/flap.png?branch=master)](http://travis-ci.org/avz/flap)
 Утилита позволяет прослушивать данные, проходящие по пайпу в настоящий момент.
 
 ![Overview](http://share.nologin.ru/img/flap-overview600.png)
