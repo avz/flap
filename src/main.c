@@ -27,7 +27,7 @@ int runClientMode(const char *sockPath) {
 	char buf[16 * 1024];
 	struct sockaddr_un addr;
 	int sock;
-	int sockBufSize = 1024 * 1024;
+	int sockBufSize = 1024 * 512;
 
 	if(strlen(sockPath) >= sizeof(addr.sun_path)) {
 		errno = ENAMETOOLONG;
@@ -44,13 +44,12 @@ int runClientMode(const char *sockPath) {
 	strncpy(addr.sun_path, sockPath, sizeof(addr.sun_path));
 	addr.sun_family = AF_UNIX;
 
-	if(connect(sock, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+	if(connect(sock, (struct sockaddr *)&addr, (socklen_t)sizeof(addr)) != 0) {
 		perror(sockPath);
 		return errno;
 	}
 
-	if(setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &sockBufSize, sizeof(sockBufSize)) != 0)
-		perror("setsockopt(sock, SOL_SOCKET, SO_SNDBUF)");
+	setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &sockBufSize, (socklen_t)sizeof(sockBufSize));
 
 	while(1) {
 		ssize_t written = 0;

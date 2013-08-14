@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <string.h>
+#include <sys/types.h>
 
 #include "Server.h"
 
@@ -17,11 +19,10 @@
 static void *Server__connectionPollerThread(void *serverPtr) {
 	struct Server *server = (struct Server *)serverPtr;
 	int s;
-	int bufSize = 1024 * 1024;
+	int bufSize = 1024 * 512;
 
 	while((s = accept(server->sock, NULL, NULL)) >= 0) {
-		if(setsockopt(s, SOL_SOCKET, SO_SNDBUF, &bufSize, sizeof(bufSize)) != 0)
-			perror("setsockopt(s, SOL_SOCKET, SO_SNDBUF)");
+		setsockopt(s, SOL_SOCKET, SO_SNDBUF, &bufSize, (socklen_t)sizeof(bufSize));
 
 		ServerClientsPool_lock(&server->pool);
 		ServerClientsPool_attachClient(&server->pool, s, O_RDONLY, 0);
@@ -36,7 +37,7 @@ void Server_init(struct Server *server) {
 	ServerClientsPool_init(&server->pool);
 }
 
-void Server_bindUnix(struct Server *server, const char *path, char forceReuse) {
+void Server_bindUnix(struct Server *server, const char *path, int forceReuse) {
 	struct sockaddr_un addr;
 
 	if(strlen(path) >= sizeof(addr.sun_path)) {
@@ -61,7 +62,7 @@ void Server_bindUnix(struct Server *server, const char *path, char forceReuse) {
 		}
 	}
 
-	if(bind(server->sock, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+	if(bind(server->sock, (struct sockaddr *)&addr, (socklen_t)sizeof(addr)) != 0) {
 		perror(addr.sun_path);
 		exit(errno);
 	}

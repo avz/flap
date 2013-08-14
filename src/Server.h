@@ -15,7 +15,7 @@ struct Server {
 
 void Server_init(struct Server *server);
 void Server_destroy(struct Server *server);
-void Server_bindUnix(struct Server *server, const char *path, char forceReuse);
+void Server_bindUnix(struct Server *server, const char *path, int forceReuse);
 void Server_write(struct Server *server, const void *buf, ssize_t len);
 
 #endif	/* SERVER_H */
